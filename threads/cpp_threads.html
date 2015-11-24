@@ -1,0 +1,1205 @@
+<!DOCTYPE HTML>
+
+
+<html>
+<head>
+	<title>C++11 threads, locks and condition variables - CodeProject</title> 
+	<link type="text/css" rel="stylesheet" href="http://codeproject.cachefly.net/App_Themes/CodeProject/Css/Main.min.css?dt=2.8.151120.1">
+
+	
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="Description" content="This article is a walk-through the C++11 support for threads and synchronization mechanisms (mutexes and condition variables).; Author: Marius Bancila; Updated: 28 May 2013; Section: C / C++ Language; Chapter: Languages; Updated: 28 May 2013" />
+<meta name="Keywords" content="C++, Dev, C++11, Concurrency,C / C++ Language,Languages,Free source code, tutorials" />
+<meta name="Author" content="Marius Bancila" />
+<meta name="Rating" content="General" />
+<meta name="Revisit-After" content="1 days" />
+<meta name="application-name" content="CodeProject" />
+<meta name="google-translate-customization" content="d908bb7ce7aff658-4c2f3a504525c916-g629383f736781a8a-13" />
+
+<link rel="dns-prefetch" href="//ajax.googleapis.com" /> 
+<link rel="canonical" href="/Articles/598695/Cplusplus-threads-locks-and-condition-variables" />
+
+
+<link rel="alternate" type="application/rss+xml" title="CodeProject Latest articles - All Topics" href="http://www.codeproject.com/WebServices/ArticleRSS.aspx?cat=1" />
+<link rel="alternate" type="application/rss+xml" title="CodeProject Latest articles - Android" href="http://www.codeproject.com/WebServices/ArticleRSS.aspx?cat=22" />
+<link rel="alternate" type="application/rss+xml" title="CodeProject Latest articles - iOS" href="http://www.codeproject.com/WebServices/ArticleRSS.aspx?cat=25" />
+<link rel="alternate" type="application/rss+xml" title="CodeProject Latest articles - C++" href="http://www.codeproject.com/WebServices/ArticleRSS.aspx?cat=2" />
+<link rel="alternate" type="application/rss+xml" title="CodeProject Latest articles - C#" href="http://www.codeproject.com/WebServices/ArticleRSS.aspx?cat=3" />
+<link rel="alternate" type="application/rss+xml" title="CodeProject Latest articles - Web" href="http://www.codeproject.com/WebServices/ArticleRSS.aspx?cat=23" />
+<link rel="alternate" type="application/rss+xml" title="CodeProject Lounge Postings" href="http://www.codeproject.com/webservices/LoungeRSS.aspx" />
+<meta name="robots" content="index, follow" />
+<link rel="search" type="application/opensearchdescription+xml" title="CodeProject" href="http://www.codeproject.com/info/OpenSearch.xml" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<base target="_top" />
+	<link rel="icon" href="/favicon.ico" type="image/ico" >
+<link rel="shortcut icon" href="/favicon.ico"  type="image/ico" >
+<link rel="apple-touch-icon" href="/images/FavIcon-Apple.png" type="image/png" >
+<script type="text/javascript" language="Javascript">//<![CDATA[
+function defrm () { /* thanks twitter */ document.write = ''; window.top.location = window.self.location;  setTimeout(function() { document.body.innerHTML = ''; }, 0);  window.self.onload = function(evt) { document.body.innerHTML = ''; }; }if (window.top !== window.self) {  try {  if (window.top.location.host) { /* will throw */ } else { defrm(); /* chrome */ }  } catch (ex) { defrm(); /* everyone else */ } }if (typeof(DemoUrl)!='undefined')   document.write(unescape('%3Cme')+'ta http'+'-equiv="re'+'fresh"                  con'+'tent="1;url='+DemoUrl+unescape('"%3CE'));
+
+//]]>
+</script>
+
+	
+
+
+
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-1735123-1']);
+	_gaq.push(['_trackPageview']);
+	_gaq.push(['_setDomainName', 'www.codeproject.com']);
+	_gaq.push(['_setSessionTimeout', '1200']); 
+
+	(function () {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+	})(); 
+</script>
+
+
+</head>	
+
+<body class="firefox firefox39">
+
+<a class="access-link" href="#Main"><img alt="Click here to Skip to main content" src="//codeproject.cachefly.net/Images/t.gif" /></a>
+
+
+
+
+
+<div class="page-background">
+
+	
+	
+
+	
+
+	
+    <div id="ctl00_STM" class="site-top-menu fluid">
+        <div class="main-content">
+            
+        </div>
+    </div>
+
+	
+    <div id="ctl00_SH" class="site-header fluid">
+        <div class="main-content">
+            <div class="logo"><a href="/"><img id="ctl00_Logo" tabindex="1" title="CodeProject" src="//codeproject.cachefly.net/App_Themes/CodeProject/Img/logo250x135.gif" alt="Home" style="height:135px;width:250px;border-width:0px;" /></a></div>
+            <div class="promo"></div>
+        </div>
+    </div>
+
+	<a href="#Main"><img alt="Click here to Skip to main content" class="access-link" 
+        src="//codeproject.cachefly.net/Images/t.gif" /></a>
+
+	
+			
+	
+
+	<div id="A" class="container-content-wrap fluid print"> 
+
+	<div itemscope itemtype="http://schema.org/Article" class="container-content"> 
+
+
+		<div class="clearfix">
+			<div class="container-breadcrumb float-left ">
+				<div><a href="/script/Content/SiteMap.aspx">Articles</a> &#187; <a href="/Chapters/5/Languages.aspx">Languages</a> &#187; <a href="/KB/cpp/"><span itemprop="articleSection">C / C++ Language</span></a> &#187; <a href="/KB/cpp/#General">General</a></div>
+			</div>
+
+			<div class="float-left">
+				
+			</div>
+
+			<div class="edit-links float-right">
+				
+			</div>
+
+			<div class="article-nav float-right">
+					
+		        
+		        
+					
+
+                
+				
+			</div>
+		</div>
+
+		<table class="extended container-article-parts" cellpadding="0" cellspacing="0">
+        <tr valign="top">
+		<td width="117px" class="article-wing-left">
+
+			
+
+		</td>
+		<td>
+			
+			<div id="AT" class="container-article  fluid tight"> 
+
+				<div class="article">
+
+					<form name="aspnetForm" method="post" action="/Articles/598695/Cplusplus-threads-locks-and-condition-variables?display=Print" id="aspnetForm" style="margin:0;padding:0">
+<div>
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+</div>
+
+<div>
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="10C1FD69" />
+</div>
+
+					
+					 
+					<div class="header">
+					    <a name="Main"></a>
+
+					    
+					    <a name="_articleTop" id="_articleTop"></a>
+					    <div class="title">
+					        
+					        <h1 id="ctl00_ArticleTitle" itemprop="name">C++11 threads, locks and condition variables</h1> 
+					    </div>
+
+                        <div style="height:34px">
+					        
+					        <div class="entry float-left">
+                                <img src="http://www.codeproject.com/script/Membership/ProfileImages/{f0a51d43-8b5e-4a77-867b-cfa0dbc521ad}.jpg" id="ctl00_avatar" class="float-left avatar" />
+                                <div class="float-left">
+
+						            <span class="author"><a href="/script/Membership/View.aspx?mid=562357" rel="author"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">Marius Bancila</span></span></a></span>, 
+						            <span class="date" itemprop="dateModified" title="Date last updated"
+                                        content="2013-05-28 01:28:00">
+							            27 May 2013</span>
+			
+                                    <a id="ctl00_LicenseLink" title="The Code Project Open License (CPOL)" class="license" href="http://www.codeproject.com/info/cpol10.aspx">CPOL</a><div id="ctl00_CurRat" class="tooltip anchorLink" style="cursor:pointer;margin-top: 5px">
+				
+							            
+
+<table cellpadding="0" cellspacing="0" class="small-text" itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating"> 
+<tr>
+	
+	<td class="nowrap">
+
+		
+			<meta itemprop="bestRating" content="5"> 
+			<meta itemprop="worstRating" content="1">
+		
+
+		<span id="ctl00_ArticleRating_VI">
+		<div class="nowrap rating-stars-medium" style="height:18px;width:80px;position:relative;">
+	<div class="clipped align-left float-left" style="height:16px;width:78px;">
+		<img src="//codeproject.cachefly.net/script/Ratings/Images/stars-fill-md.png" style="border-width:0px;" />
+	</div><div class="clipped" style="height:16px;width:2px;position:relative;">
+		<img src="//codeproject.cachefly.net/script/Ratings/Images/stars-empty-md.png" style="border-width:0px;position:absolute;top:0;right:0;" />
+	</div>
+</div>
+		</span>
+
+		
+	</td>
+	
+	<td id="ctl00_ArticleRating_VR" class="nowrap">
+		&nbsp;
+		<span id="ctl00_ArticleRating_VotesR">&nbsp;<span itemprop="ratingValue" class="rating">4.92</span> (<span itemprop="ratingCount" class="count">51</span> votes)</span>
+		
+	</td>
+
+</tr>
+
+</table>
+
+
+							            <div id="ctl00_RB" class="speech-bubble-container-up">
+								            <div class="speech-bubble-up" style="width:150px !important">
+									                        
+<div>
+<table class="feature" width="100%" height="20px" title="Voting Distribution. Recent data only" cellpadding="0" cellspacing="0"><tr class="chart-row"><td class="chart-column"><span title="0 votes">1</span></td>
+<td class="chart-column"><span title="0 votes">2</span></td>
+<td class="chart-column"><div class="rating-ignore-vote" title="Votes not included in score."><img src="//codeproject.cachefly.net/script/Ratings/Images/pollcol.gif" width="20pxpx" height="1px" border="0px" alt="1 vote, 2.0%" title="1 vote, 2.0%" /></div><span title="0 votes">3</span></td>
+<td class="chart-column"><div><img src="//codeproject.cachefly.net/script/Ratings/Images/pollcol.gif" width="20pxpx" height="3px" border="0px" alt="7 votes, 14.0%" title="7 votes, 14.0%" /></div><span title="7 votes">4</span></td>
+<td class="chart-column"><div><img src="//codeproject.cachefly.net/script/Ratings/Images/pollcol.gif" width="20pxpx" height="20px" border="0px" alt="43 votes, 86.0%" title="43 votes, 86.0%" /></div><span title="43 votes">5</span></td>
+</tr></table><div class="small-text align-center">4.92/5 - 51 votes</div><div class="small-text align-center subdue">1 removed</div><div class="small-text align-center subdue">μ 4.90, σ<sub>a</sub> 1.00 [<a href="/KB/FAQs/RatingReputationFAQ.aspx#noisefilter">?</a>]</div>
+</div>
+								            </div>
+								            <div class="speech-bubble-pointer-up">
+									            <div class="speech-bubble-pointer-up-inner"></div>
+								            </div>
+							            </div>
+						            </div>
+                                </div>
+					        </div>
+
+                            
+						    
+						    	
+                        </div>
+
+   					    
+                        <div id="ctl00_description" class="summary" itemprop="headline">This article is a walk-through the C++11 support for threads and synchronization mechanisms (mutexes and condition variables).</div><span id="ctl00_thumbnailUrl" class="date" itemprop="image" content="http://codeproject.cachefly.net/script/Articles/Images/article100x80.png"></span>			
+
+                    </div>
+                    
+					
+					
+
+					
+
+					
+					
+					
+
+						
+					
+
+					
+
+						
+						<div id="contentdiv" class="text" itemprop="articleBody">
+						
+
+
+
+<h2>Threads</h2>
+<p>The <a href="http://en.cppreference.com/w/cpp/thread/thread">std::thread</a> class represents a thread of execution and is available in the <code>&lt;thread&gt;</code> header. <code>std::thread</code> can work with regular functions, lambdas and functors (a class implementing operator()). 
+Moreover it allows you to pass any number of parameters to the thread function.&nbsp;</p>
+<pre>#include &lt;thread&gt;
+ 
+<span class="code-keyword">void</span> func()
+{
+   <span class="code-comment">//</span><span class="code-comment"> do some work
+</span>}
+ 
+<span class="code-keyword">int</span> main()
+{
+   std::thread t(func);
+   t.<span class="code-sdkkeyword">join</span>();
+ 
+   <span class="code-keyword">return</span> <span class="code-digit">0</span>;
+}</pre>
+
+<p>In this example <code>t</code> is a thread object representing the thread under which function <code>func()</code> runs. The call to <a href="http://en.cppreference.com/w/cpp/thread/thread/join">join</a> blocks the calling thread (in this case the main thread) until the joined thread finishes execution. 
+If the thread function returns a value, it is ignored. However, the function can take any number of parameters.</p>
+<pre><span class="code-keyword">void</span> func(<span class="code-keyword">int</span> i, <span class="code-keyword">double</span> d, <span class="code-keyword">const</span> std::string&amp; s)
+{
+    std::cout &lt;&lt; i &lt;&lt; <span class="code-string">"</span><span class="code-string">, "</span> &lt;&lt; d &lt;&lt; <span class="code-string">"</span><span class="code-string">, "</span> &lt;&lt; s &lt;&lt; std::endl;
+}
+ 
+<span class="code-keyword">int</span> main()
+{
+   std::thread t(func, <span class="code-digit">1</span>, <span class="code-digit">12</span>.<span class="code-digit">50</span>, <span class="code-string">"</span><span class="code-string">sample"</span>);
+   t.<span class="code-sdkkeyword">join</span>();
+ 
+   <span class="code-keyword">return</span> <span class="code-digit">0</span>;
+}</pre>
+
+<p>Even though it's possible to pass any number of parameters to the thread function, all parameters are passed by value. 
+If the function needs to take parameters by reference, the passed arguments must be wrapped in a <a href="http://en.cppreference.com/w/cpp/utility/functional/ref">std::ref or std::cref</a> like in the following example.</p>
+<pre><span class="code-keyword">void</span> func(int&amp; a)
+{
+   a++;
+}
+ 
+<span class="code-keyword">int</span> main()
+{
+   <span class="code-keyword">int</span> a = <span class="code-digit">42</span>;
+   std::thread t(func, std::<span class="code-keyword">ref</span>(a));
+   t.<span class="code-sdkkeyword">join</span>();
+ 
+   std::cout &lt;&lt; a &lt;&lt; std::endl;
+ 
+   <span class="code-keyword">return</span> <span class="code-digit">0</span>;
+}</pre>
+<p>The program prints 43, but without wrapping a in a <code>std::ref</code> the output would be 42.</p>
+
+<p>Apart from the join method, the thread class provides a couple more operations:</p>
+<ul>
+<li><a href="http://en.cppreference.com/w/cpp/thread/thread/swap">swap</a>: exchanges the underlying handles of two thread objects</li>
+<li><a href="http://en.cppreference.com/w/cpp/thread/thread/detach">detach</a>:  allows a thread of execution to continue independently of the thread object. Detached threads are no longer joinable (you cannot wait for them).
+<pre><span class="code-keyword">int</span> main()
+{
+    std::<span class="code-keyword">thread</span> t(funct);
+    t.detach();
+ 
+    <span class="code-keyword">return</span> <span class="code-digit">0</span>;
+}</pre>
+</li>
+</ul>
+
+<p>An important thing to note is that if a thread function throws an exception it won't be caught with a regular try-catch block. In other words, this won't work:</p>
+<pre><span class="code-keyword">try</span>
+{
+    std::<span class="code-keyword">thread</span> t1(func);
+    std::<span class="code-keyword">thread</span> t2(func);
+ 
+    t1.join();
+    t2.join();
+}
+<span class="code-keyword">catch</span>(<span class="code-keyword">const</span> std::exception&amp; ex)
+{
+    std::cout &lt;&lt; ex.what() &lt;&lt; std::endl;
+}</pre>
+
+<p>To propagate exceptions between threads you could catch them in the thread function and store them in a place where it can be accessed later.</p>
+<pre>std::mutex                       g_mutex;
+std::vector&lt;std::exception_ptr&gt;  g_exceptions;
+
+<span class="code-keyword">void</span> throw_function()
+{
+   <span class="code-keyword">throw</span> std::exception(<span class="code-string">"</span><span class="code-string">something wrong happened"</span>);
+}
+
+<span class="code-keyword">void</span> func()
+{
+   <span class="code-keyword">try</span>
+   {
+      throw_function();
+   }
+   <span class="code-keyword">catch</span>(...)
+   {
+      std::lock_guard&lt;std::mutex&gt; <span class="code-keyword">lock</span>(g_mutex);
+      g_exceptions.push_back(std::current_exception());
+   }
+}
+
+<span class="code-keyword">int</span> main()
+{
+   g_exceptions.clear();
+
+   std::thread t(func);
+   t.<span class="code-sdkkeyword">join</span>();
+
+   <span class="code-keyword">for</span>(auto&amp; e : g_exceptions)
+   {
+      <span class="code-keyword">try</span> 
+      {
+         <span class="code-keyword">if</span>(e != nullptr)
+         {
+            std::rethrow_exception(e);
+         }
+      }
+      <span class="code-keyword">catch</span>(<span class="code-keyword">const</span> std::exception&amp; e)
+      {
+         std::cout &lt;&lt; e.what() &lt;&lt; std::endl;
+      }
+   }
+
+   <span class="code-keyword">return</span> <span class="code-digit">0</span>;
+}</pre>
+<p>For more information about catching and propagating exceptions you can read <a href="http://binglongx.wordpress.com/2010/01/03/handling-c-exceptions-thrown-from-worker-thread-in-the-main-thread/">Handling C++ exceptions thrown from worker thread in the main thread</a> and <a href="http://stackoverflow.com/questions/233127/how-can-i-propagate-exceptions-between-threads">How can I propagate exceptions between threads?</a>.</p>
+
+<p>Before going further it worth noting that the <code>&lt;thread&gt;</code> header provides some helper functions in namespace <code>std::this_thread</code>:</p>
+<ul>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/get_id">get_id</a>: returns the id of the current thread&nbsp;</li>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/yield">yield</a>: tells the scheduler to run other threads and can be used when you are in a busy waiting state</li>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/sleep_for">sleep_for</a>: blocks the execution of the current thread for at least the specified period</li>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/sleep_until">sleep_util</a>: blocks the execution of the current thread until the specified moment of time has been reached</li>
+</ul>
+
+
+<h2>Locks</h2>
+<p>In the last example I needed to synchronize the access to the <code>g_exceptions</code> vector to make sure only one thread at a time can push a new element. For this I used a mutex and a lock on the mutex. A mutex is a core synchronization primitive and it C++11 it comes in four flavors in the <code>&lt;mutex&gt;</code> header.</p>
+<ul>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/mutex">mutex</a>: provides the core functions <a href="http://en.cppreference.com/w/cpp/thread/mutex/lock">lock()</a> and <a href="http://en.cppreference.com/w/cpp/thread/mutex/unlock">unlock()</a> and the non-blocking <a href="http://en.cppreference.com/w/cpp/thread/mutex/try_lock">try_lock()</a> method that returns if the mutex is not available.</li>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/recursive_mutex">recursive_mutex</a>: allows multiple acquisitions of the mutex from the same thread.</li>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/timed_mutex">timed_mutex</a>: similar to mutex, but it comes with two more methods <a href="http://en.cppreference.com/w/cpp/thread/timed_mutex/try_lock_for">try_lock_for()</a> and <a href="http://en.cppreference.com/w/cpp/thread/timed_mutex/try_lock_until">try_lock_until()</a> that try to acquire the mutex for a period of time or until a moment in time is reached.</li>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/recursive_timed_mutex">recursive_timed_mutex</a>: is a combination of timed_mutex and recusive_mutex.</li>
+</ul>
+
+<p>Here is an example for using a <code>std::mutex</code> (notice the use of the <code>get_id()</code> and <code>sleep_for()</code> helper functions mentioned earlier).&nbsp;</p>
+<pre>#include &lt;iostream&gt;
+#include &lt;thread&gt;
+#include &lt;mutex&gt;
+#include &lt;chrono&gt;
+ 
+std::mutex g_lock;
+ 
+<span class="code-keyword">void</span> func()
+{
+    g_lock.<span class="code-keyword">lock</span>();
+ 
+    std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">entered thread "</span> &lt;&lt; std::this_thread::get_id() &lt;&lt; std::endl;
+    std::this_thread::sleep_for(std::chrono::seconds(rand() % <span class="code-digit">10</span>));
+    std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">leaving thread "</span> &lt;&lt; std::this_thread::get_id() &lt;&lt; std::endl;
+ 
+    g_lock.unlock();
+}
+ 
+<span class="code-keyword">int</span> main()
+{
+    srand((unsigned <span class="code-keyword">int</span>)time(<span class="code-digit">0</span>));
+ 
+    std::thread t1(func);
+    std::thread t2(func);
+    std::thread t3(func);
+ 
+    t1.<span class="code-sdkkeyword">join</span>();
+    t2.<span class="code-sdkkeyword">join</span>();
+    t3.<span class="code-sdkkeyword">join</span>();
+ 
+    <span class="code-keyword">return</span> <span class="code-digit">0</span>;
+}</pre>
+<p>The output looks like this:</p>
+<pre>entered <span class="code-keyword">thread</span> <span class="code-digit">10144</span>
+leaving <span class="code-keyword">thread</span> <span class="code-digit">10144</span>
+entered <span class="code-keyword">thread</span> <span class="code-digit">4188</span>
+leaving <span class="code-keyword">thread</span> <span class="code-digit">4188</span>
+entered <span class="code-keyword">thread</span> <span class="code-digit">3424</span>
+leaving <span class="code-keyword">thread</span> <span class="code-digit">3424</span></pre>
+<p>The <code>lock()</code> and <code>unlock()</code> methods should be straight forward. The first locks the mutex, blocking if the mutex is not available, and the later unlocks the mutex.</p>
+
+<p>The next example shows a simple thread-safe container (using <code>std::vector</code> internally). This container has methods like <code>add()</code> that adds a single element and <code>addrange()</code> that adds multiple elements, and internally just calls <code>add()</code>.&nbsp;&nbsp;</p><p><strong>Note</strong>: However, as pointed in the comments below, this is not a thread-safe container for several reasons including the use of&nbsp;<code>va_args</code>. Also, the&nbsp;<code>dump()</code>&nbsp;method should not belong to the container and in a real implementation it would be a helper (stand-alone) function. The purpose of this example is&nbsp;merely&nbsp;to&nbsp;teach some concepts about mutexes and not to make a full fledged, error-free, thread-safe container.&nbsp;&nbsp;</p>
+<pre>template &lt;typename T&gt;
+<span class="code-keyword">class</span> container 
+{
+    std::mutex _lock;
+    std::vector&lt;T&gt; _elements;
+<span class="code-keyword">public</span>:
+    <span class="code-keyword">void</span> <span class="code-keyword">add</span>(T element) 
+    {
+        _lock.<span class="code-keyword">lock</span>();
+        _elements.push_back(element);
+        _lock.unlock();
+    }
+ 
+    <span class="code-keyword">void</span> addrange(<span class="code-keyword">int</span> num, ...)
+    {
+        va_list arguments;
+ 
+        va_start(arguments, num);
+ 
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = <span class="code-digit">0</span>; i &lt; num; i++)
+        {
+            _lock.<span class="code-keyword">lock</span>();
+            <span class="code-keyword">add</span>(va_arg(arguments, T));
+            _lock.unlock();
+        }
+ 
+        va_end(arguments); 
+    }
+ 
+    <span class="code-keyword">void</span> dump()
+    {
+        _lock.<span class="code-keyword">lock</span>();
+        <span class="code-keyword">for</span>(auto e : _elements)
+            std::cout &lt;&lt; e &lt;&lt; std::endl;
+        _lock.unlock();
+    }
+};
+ 
+<span class="code-keyword">void</span> func(container&lt;int&gt;&amp; cont)
+{
+    cont.addrange(<span class="code-digit">3</span>, rand(), rand(), rand());
+}
+ 
+<span class="code-keyword">int</span> main()
+{
+    srand((unsigned <span class="code-keyword">int</span>)time(<span class="code-digit">0</span>));
+ 
+    container&lt;int&gt; cont;
+ 
+    std::thread t1(func, std::<span class="code-keyword">ref</span>(cont));
+    std::thread t2(func, std::<span class="code-keyword">ref</span>(cont));
+    std::thread t3(func, std::<span class="code-keyword">ref</span>(cont));
+ 
+    t1.<span class="code-sdkkeyword">join</span>();
+    t2.<span class="code-sdkkeyword">join</span>();
+    t3.<span class="code-sdkkeyword">join</span>();
+ 
+    cont.dump();
+ 
+    <span class="code-keyword">return</span> <span class="code-digit">0</span>;
+}</pre>
+<p>When you execute this program it runs into a deadlock. The reason is the container attempts to acquire the mutex multiple times before releasing it and that is not possible. 
+That is where <a href="http://en.cppreference.com/w/cpp/thread/recursive_mutex">std::recursive_mutex</a> come into the picture. It allows a thread to acquire the same mutex multiple times. 
+The maximum number of times the mutex can be acquired is not specified, but if that number is reached, calling lock would throw a <a href="http://en.cppreference.com/w/cpp/error/system_error">std::system_error</a>. Therefore to fix the problem in the code above (apart from changing the implementation of addrange not to call <code>lock</code> and <code>unlock</code>) is to replace the mutex with a <a href="http://en.cppreference.com/w/cpp/thread/recursive_mutex">std::recursive_mutex</a>.</p>
+<pre><span class="code-keyword">template</span> &lt;typename T&gt;
+<span class="code-keyword">class</span> container 
+{
+    std::recursive_mutex _lock;
+    <span class="code-comment">//</span><span class="code-comment"> ...
+</span>};</pre>
+<p>Then, you get an output like this:</p>
+<pre><span class="code-digit">6334</span>
+<span class="code-digit">18467</span>
+<span class="code-digit">41</span>
+<span class="code-digit">6334</span>
+<span class="code-digit">18467</span>
+<span class="code-digit">41</span>
+<span class="code-digit">6334</span>
+<span class="code-digit">18467</span>
+<span class="code-digit">41</span></pre>
+<p>The astute reader will notice the same numbers are generated in each call to <code>func()</code>. That is because the seed is thread local, and the call to <a href="http://www.cplusplus.com/reference/cstdlib/srand/">srand()</a> only initializes the seed from the main thread. In the other worker threads it doesn't get initialized, and therefore you get the same numbers every time.</p>
+
+<p>Explicit locking and unlocking can lead to problems, such as forgetting to unlock or incorrect order of locks acquiring that can generate deadlocks. The standard provides several classes and functions to help with this problems.
+The wrapper classes allow consistent use of the mutexes in a RAII-style with auto locking and unlocking within the scope of a block. These wrappers are:</p>
+<ul>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/lock_guardv">lock_guard</a>: when the object is constructed it attempts to acquire ownership of the mutex (by calling <code>lock()</code>) and when the object is destructed it automatically releases the mutex (by calling <code>unlock()</code>). This is a non-copyable class.
+  </li><li><a href="http://en.cppreference.com/w/cpp/thread/unique_lock">unique_lock</a>: is a general purpose mutex wrapper that unlike lock_quard also provides support for deferred locking, time locking, recursive locking, transfer of lock ownership and use of condition variables. This is also a non-copyable class, but it is moveable.
+</li></ul>
+<p>With these wrappers we can rewrite the container class like this:</p>
+<pre>template &lt;typename T&gt;
+<span class="code-keyword">class</span> container 
+{
+    std::recursive_mutex _lock;
+    std::vector&lt;T&gt; _elements;
+<span class="code-keyword">public</span>:
+    <span class="code-keyword">void</span> <span class="code-keyword">add</span>(T element) 
+    {
+        std::lock_guard&lt;std::recursive_mutex&gt; locker(_lock);
+        _elements.push_back(element);
+    }
+ 
+    <span class="code-keyword">void</span> addrange(<span class="code-keyword">int</span> num, ...)
+    {
+        va_list arguments;
+ 
+        va_start(arguments, num);
+ 
+        <span class="code-keyword">for</span> (<span class="code-keyword">int</span> i = <span class="code-digit">0</span>; i &lt; num; i++)
+        {
+            std::lock_guard&lt;std::recursive_mutex&gt; locker(_lock);
+            <span class="code-keyword">add</span>(va_arg(arguments, T));
+        }
+ 
+        va_end(arguments); 
+    }
+ 
+    <span class="code-keyword">void</span> dump()
+    {
+        std::lock_guard&lt;std::recursive_mutex&gt; locker(_lock);
+        <span class="code-keyword">for</span>(auto e : _elements)
+            std::cout &lt;&lt; e &lt;&lt; std::endl;
+    }
+};</pre>
+
+<p>One can argue though that the <code>dump()</code> method should be made const, since it does not alter the state of the container. But if you mark the method const you get the following compiler error:</p>
+
+<blockquote>‘std::lock_guard&lt;_Mutex&gt;::lock_guard(_Mutex &amp;)' : cannot convert parameter 1 from ‘const std::recursive_mutex' to ‘std::recursive_mutex &amp;'</blockquote>
+
+<p>A mutex (regardless which implementation is used) must be acquired and release and that implies calls to the non-constant <code>lock()</code> and <code>unlock()</code> methods. 
+So the argument to <code>lock_guard</code> cannot be logically const (as the mutext would be if the method was const). 
+The solution to this problem is to make the mutex <code>mutable</code>. 
+Mutable allows changing state from const functions. It should however be used only for hidden or &quot;meta&quot; state (imagine caching computed or looked-up data so a next call can complete immediately, or altering bits like a mutex that only complement the actual state of an object).</p>
+<pre>template &lt;typename T&gt;
+<span class="code-keyword">class</span> container 
+{
+   mutable std::recursive_mutex _lock;
+   std::vector&lt;T&gt; _elements;
+<span class="code-keyword">public</span>:
+   <span class="code-keyword">void</span> dump() <span class="code-keyword">const</span>
+   {
+      std::lock_guard&lt;std::recursive_mutex&gt; locker(_lock);
+      <span class="code-keyword">for</span>(auto e : _elements)
+         std::cout &lt;&lt; e &lt;&lt; std::endl;
+   }
+};</pre>
+
+<p>The constructors of these wrapper guards have overloads that take an argument indicating the locking strategy. The available strategies are:</p>
+<ul>
+  <li><code>defer_lock</code> of type <code>defer_lock_t</code>: do not acquire ownership of the mutex</li>
+  <li><code>try_to_lock</code> of type <code>try_to_lock_t</code>: try to acquire ownership of the mutex without blocking</li>
+  <li><code>adopt_lock</code> of type <code>adopt_lock_t</code>: assume the calling thread already has ownership of the mutex</li>
+</ul>
+<p>These strategies are declared like this:</p>
+<pre><span class="code-keyword">struct</span> defer_lock_t { };
+<span class="code-keyword">struct</span> try_to_lock_t { };
+<span class="code-keyword">struct</span> adopt_lock_t { };
+ 
+<span class="code-keyword">constexpr</span> std::defer_lock_t defer_lock = std::defer_lock_t();
+<span class="code-keyword">constexpr</span> std::try_to_lock_t try_to_lock = std::try_to_lock_t();
+<span class="code-keyword">constexpr</span> std::adopt_lock_t adopt_lock = std::adopt_lock_t();</pre>
+<p>Apart from these wrappers for mutexes, the standard also provides a couple of methods for locking one or more mutexes.</p>
+<ul>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/lock">lock</a>: locks the mutexes using a deadlock avoiding algorithm (by using calls to <code>lock()</code>, <code>try_lock()</code> and <code>unlock()</code>).</li>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/try_lock">try_lock</a>: tries to call the mutexes by calling <code>try_lock()</code> in the order of which mutexes were specified.</li>
+</ul>
+
+<p>Here is an example of a deadlock case: we have a container of elements and we have a function <code>exchange()</code> that swaps one element from a container into the other container. To be thread-safe, this function synchronizes the access to the two containers, by acquiring a mutex associated with each container.</p>
+<pre>template &lt;typename T&gt;
+<span class="code-keyword">class</span> container 
+{
+<span class="code-keyword">public</span>:
+    std::mutex _lock;
+    std::set&lt;T&gt; _elements;
+ 
+    <span class="code-keyword">void</span> <span class="code-keyword">add</span>(T element) 
+    {
+        _elements.insert(element);
+    }
+ 
+    <span class="code-keyword">void</span> <span class="code-keyword">remove</span>(T element) 
+    {
+        _elements.erase(element);
+    }
+};
+ 
+<span class="code-keyword">void</span> exchange(container&lt;int&gt;&amp; cont1, container&lt;int&gt;&amp; cont2, <span class="code-keyword">int</span> <span class="code-sdkkeyword">value</span>)
+{
+    cont1._lock.<span class="code-keyword">lock</span>();
+    std::this_thread::sleep_for(std::chrono::seconds(<span class="code-digit">1</span>)); <span class="code-comment">//</span><span class="code-comment"> &lt;-- forces context switch to simulate the deadlock
+</span>    cont2._lock.<span class="code-keyword">lock</span>();    
+ 
+    cont1.<span class="code-keyword">remove</span>(<span class="code-sdkkeyword">value</span>);
+    cont2.<span class="code-keyword">add</span>(<span class="code-sdkkeyword">value</span>);
+ 
+    cont1._lock.unlock();
+    cont2._lock.unlock();
+}</pre>
+
+<p>Suppose this function is called from two different threads, from the first, an element is removed from container 1 and added to container 2, and in the second it is removed from container 2 and added to container 1. This can lead to a deadblock (if the thread context switches from one thread to another just after acquiring the first lock).</p>
+<pre><span class="code-keyword">int</span> main()
+{
+    srand((<span class="code-keyword">unsigned</span> <span class="code-keyword">int</span>)time(NULL));
+ 
+    container&lt;int&gt; cont1; 
+    cont1.add(<span class="code-digit">1</span>);
+    cont1.add(<span class="code-digit">2</span>);
+    cont1.add(<span class="code-digit">3</span>);
+ 
+    container&lt;int&gt; cont2; 
+    cont2.add(<span class="code-digit">4</span>);
+    cont2.add(<span class="code-digit">5</span>);
+    cont2.add(<span class="code-digit">6</span>);
+ 
+    std::<span class="code-keyword">thread</span> t1(exchange, std::<span class="code-keyword">ref</span>(cont1), std::<span class="code-keyword">ref</span>(cont2), <span class="code-digit">3</span>);
+    std::<span class="code-keyword">thread</span> t2(exchange, std::<span class="code-keyword">ref</span>(cont2), std::<span class="code-keyword">ref</span>(cont1), <span class="code-digit">6</span>);
+ 
+    t1.join();
+    t2.join();
+ 
+    <span class="code-keyword">return</span> <span class="code-digit">0</span>;
+}</pre>
+
+<p>To fix the problem, you can use <code>std::lock</code> that guaranties the locks are acquired in a deadlock-free way:</p>
+<pre><span class="code-keyword">void</span> exchange(container&lt;int&gt;&amp; cont1, container&lt;int&gt;&amp; cont2, <span class="code-keyword">int</span> <span class="code-sdkkeyword">value</span>)
+{
+    std::<span class="code-keyword">lock</span>(cont1._lock, cont2._lock); 
+ 
+    cont1.<span class="code-keyword">remove</span>(<span class="code-sdkkeyword">value</span>);
+    cont2.<span class="code-keyword">add</span>(<span class="code-sdkkeyword">value</span>);
+ 
+    cont1._lock.unlock();
+    cont2._lock.unlock();
+}</pre>
+
+
+<h2>Condition variables</h2>
+<p>Another synchronization primitive for which C++11 provides support is the <a href="http://en.wikipedia.org/wiki/Condition_variable#Waiting_and_signaling">condition variable</a> that enables blocking of one or more threads until either a notification is received from another thread or a timeout or a <a href="http://en.wikipedia.org/wiki/Spurious_wakeup">spurious wake-up</a> occurs.
+There are two implementations for condition variables available in the <code>&lt;condition_variable&gt;</code> header:</p>
+<ul>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/condition_variable">condition_variable</a>: requires any thread that wants to wait on it to acquire a <a href="http://en.cppreference.com/w/cpp/thread/unique_lock">std::unique_lock</a> first.</li>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/condition_variable_any">condition_variable_any</a>: is a more general implementation that works with any type that satisfies the condition of a basic lock (an implementation that provides a <code>lock()</code> and <code>unlock()</code> method). This might be more expensive to use (in terms of performance and operating system resources), therefore it should be preferred only if the additional flexibility it provides is necessary.</li>
+</ul>
+
+<p>The following describes how condition variables work:</p>
+<ul>
+  <li>There must be at least one thread that is waiting for a condition to become true. The waiting thread must first acquire a <code>unique_lock</code>. This lock is passed to the <code>wait()</code> method, that releases the mutex and suspends the thread until the condition variable is signaled. When that happens the thread is awaken and the lock is re-acquired.</li>
+  <li>There must be at least one thread that is signaling that a condition becomes true. The signaling can be done with <a href="http://en.cppreference.com/w/cpp/thread/condition_variable/notify_one">notify_one()</a> which unblocks one thread (any) that is waiting for the condition to be signaled or with <a href="http://en.cppreference.com/w/cpp/thread/condition_variable/notify_all">notify_all()</a> which unblocks all the threads that are waiting for the condition.</li>
+  <li>Because of some complications in making the condition wake-up completely predictable on multiprocessor systems, spurious wake-ups can occur. That means a thread is awaken even if nobody signaled the condition variable. Therefore it is necessary to check if the condition is still true after the thread has awaken. And since spurious wake-ups can occur multiple times, that check must be done in a loop.</li>
+</ul>
+
+<p>The code below shows an example of using a condition variable to synchronize threads: several &quot;worker&quot; threads may produce an error during their work and they put the error code in a queue. A &quot;logger&quot; thread processes these error codes, by getting them from the queue and printing them. The workers signal the logger when an error occurred. The logger is waiting on the condition variable to be signaled. To avoid spurious wakeups the wait happens in a loop where a boolean condition is checked.</p>
+<pre>#include &lt;thread&gt;
+#include &lt;mutex&gt;
+#include &lt;condition_variable&gt;
+#include &lt;iostream&gt;
+#include &lt;queue&gt;
+#include &lt;random&gt;
+
+std::mutex              g_lockprint;
+std::mutex              g_lockqueue;
+std::condition_variable g_queuecheck;
+std::queue&lt;int&gt;         g_codes;
+<span class="code-keyword">bool</span>                    g_done;
+<span class="code-keyword">bool</span>                    g_notified;
+
+<span class="code-keyword">void</span> workerfunc(<span class="code-keyword">int</span> id, std::mt19937&amp; generator)
+{
+    <span class="code-comment">//</span><span class="code-comment"> print a starting message
+</span>    {
+        std::unique_lock&lt;std::mutex&gt; locker(g_lockprint);
+        std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">[worker "</span> &lt;&lt; id &lt;&lt; <span class="code-string">"</span><span class="code-string">]\trunning..."</span> &lt;&lt; std::endl;
+    }
+
+    <span class="code-comment">//</span><span class="code-comment"> simulate work
+</span>    std::this_thread::sleep_for(std::chrono::seconds(<span class="code-digit">1</span> + generator() % <span class="code-digit">5</span>));
+
+    <span class="code-comment">//</span><span class="code-comment"> simulate error
+</span>    <span class="code-keyword">int</span> errorcode = id*100+1;
+    {
+        std::unique_lock&lt;std::mutex&gt; locker(g_lockprint);
+        std::cout  &lt;&lt; <span class="code-string">"</span><span class="code-string">[worker "</span> &lt;&lt; id &lt;&lt; <span class="code-string">"</span><span class="code-string">]\tan error occurred: "</span> &lt;&lt; errorcode &lt;&lt; std::endl;
+    }
+
+    <span class="code-comment">//</span><span class="code-comment"> notify error to be logged
+</span>    {
+        std::unique_lock&lt;std::mutex&gt; locker(g_lockqueue);
+        g_codes.push(errorcode);
+        g_notified = <span class="code-keyword">true</span>;
+        g_queuecheck.notify_one();
+    }
+}
+
+<span class="code-keyword">void</span> loggerfunc()
+{
+    <span class="code-comment">//</span><span class="code-comment"> print a starting message
+</span>    {
+        std::unique_lock&lt;std::mutex&gt; locker(g_lockprint);
+        std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">[logger]\trunning..."</span> &lt;&lt; std::endl;
+    }
+
+    <span class="code-comment">//</span><span class="code-comment"> loop until end is signaled
+</span>    <span class="code-keyword">while</span>(!g_done)
+    {
+        std::unique_lock&lt;std::mutex&gt; locker(g_lockqueue);
+
+        <span class="code-keyword">while</span>(!g_notified) <span class="code-comment">//</span><span class="code-comment"> used to avoid spurious wakeups 
+</span>        {
+            g_queuecheck.wait(locker);
+        }
+
+        <span class="code-comment">//</span><span class="code-comment"> if there are error codes in the queue process them
+</span>        <span class="code-keyword">while</span>(!g_codes.empty())
+        {
+            std::unique_lock&lt;std::mutex&gt; locker(g_lockprint);
+            std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">[logger]\tprocessing error:  "</span> &lt;&lt; g_codes.front()  &lt;&lt; std::endl;
+            g_codes.pop();
+        }
+
+        g_notified = <span class="code-keyword">false</span>;
+    }
+}
+
+<span class="code-keyword">int</span> main()
+{
+    <span class="code-comment">//</span><span class="code-comment"> initialize a random generator
+</span>    std::mt19937 generator((unsigned <span class="code-keyword">int</span>)std::chrono::system_clock::now().time_since_epoch().count());
+
+    <span class="code-comment">//</span><span class="code-comment"> start the logger
+</span>    std::thread loggerthread(loggerfunc);
+
+    <span class="code-comment">//</span><span class="code-comment"> start the working threads
+</span>    std::vector&lt;std::thread&gt; threads;
+    <span class="code-keyword">for</span>(<span class="code-keyword">int</span> i = <span class="code-digit">0</span>; i &lt; <span class="code-digit">5</span>; ++i)
+    {
+        threads.push_back(std::thread(workerfunc, i+1, std::<span class="code-keyword">ref</span>(generator)));
+    }
+
+    <span class="code-comment">//</span><span class="code-comment"> work for the workers to finish
+</span>    <span class="code-keyword">for</span>(auto&amp; t : threads)
+        t.<span class="code-sdkkeyword">join</span>();
+
+    <span class="code-comment">//</span><span class="code-comment"> notify the logger to finish and wait for it
+</span>    g_done = <span class="code-keyword">true</span>;
+    loggerthread.<span class="code-sdkkeyword">join</span>();
+
+    <span class="code-keyword">return</span> <span class="code-digit">0</span>;
+}</pre>
+<p>Running this code produces an output that looks like this (notice this output is different with each run because each worker thread works, i.e. sleeps, for a random interval):</p>
+<pre>[logger]        running...
+[worker <span class="code-digit">1</span>]      running...
+[worker <span class="code-digit">2</span>]      running...
+[worker <span class="code-digit">3</span>]      running...
+[worker <span class="code-digit">4</span>]      running...
+[worker <span class="code-digit">5</span>]      running...
+[worker <span class="code-digit">1</span>]      an error occurred: <span class="code-digit">101</span>
+[worker <span class="code-digit">2</span>]      an error occurred: <span class="code-digit">201</span>
+[logger]        processing error:  <span class="code-digit">101</span>
+[logger]        processing error:  <span class="code-digit">201</span>
+[worker <span class="code-digit">5</span>]      an error occurred: <span class="code-digit">501</span>
+[logger]        processing error:  <span class="code-digit">501</span>
+[worker <span class="code-digit">3</span>]      an error occurred: <span class="code-digit">301</span>
+[worker <span class="code-digit">4</span>]      an error occurred: <span class="code-digit">401</span>
+[logger]        processing error:  <span class="code-digit">301</span>
+[logger]        processing error:  <span class="code-digit">401</span></pre>
+<p>The <code>wait()</code> method seen above has two overloads:</p>
+<ul>
+  <li>one that only takes a <code>unique_lock</code>; this one releases the lock, blocks the thread and adds it to the queue of threads that are waiting on this condition variable; the thread wakes up when the the condition variable is signaled or when a spurious wakeup occurs. When any of those happen, the lock is reacquired and the function returns.</li>
+  <li>one that in addition to the <code>unique_lock</code> also takes a predicate that is used to loop until it returns false; this overload may be used to avoid spurious wakeups. It is basically equivalent to:
+<pre><span class="code-keyword">while</span>(!predicate()) 
+   wait(lock);</pre>
+</li>
+</ul>
+
+<p>As a result the use of the boolean flag <code>g_notified</code> in the example above can be avoided by using the wait overload that takes a predicate that verifies the state of the queue (empty or not):</p>
+<pre><span class="code-keyword">void</span> workerfunc(<span class="code-keyword">int</span> id, std::mt19937&amp; generator)
+{
+    <span class="code-comment">//</span><span class="code-comment"> print a starting message
+</span>    {
+        std::unique_lock&lt;std::mutex&gt; locker(g_lockprint);
+        std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">[worker "</span> &lt;&lt; id &lt;&lt; <span class="code-string">"</span><span class="code-string">]\trunning..."</span> &lt;&lt; std::endl;
+    }
+
+    <span class="code-comment">//</span><span class="code-comment"> simulate work
+</span>    std::this_thread::sleep_for(std::chrono::seconds(<span class="code-digit">1</span> + generator() % <span class="code-digit">5</span>));
+
+    <span class="code-comment">//</span><span class="code-comment"> simulate error
+</span>    <span class="code-keyword">int</span> errorcode = id*100+1;
+    {
+        std::unique_lock&lt;std::mutex&gt; locker(g_lockprint);
+        std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">[worker "</span> &lt;&lt; id &lt;&lt; <span class="code-string">"</span><span class="code-string">]\tan error occurred: "</span> &lt;&lt; errorcode &lt;&lt; std::endl;
+    }
+
+    <span class="code-comment">//</span><span class="code-comment"> notify error to be logged
+</span>    {
+        std::unique_lock&lt;std::mutex&gt; locker(g_lockqueue);
+        g_codes.push(errorcode);
+        g_queuecheck.notify_one();
+    }
+}
+
+<span class="code-keyword">void</span> loggerfunc()
+{
+    <span class="code-comment">//</span><span class="code-comment"> print a starting message
+</span>    {
+        std::unique_lock&lt;std::mutex&gt; locker(g_lockprint);
+        std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">[logger]\trunning..."</span> &lt;&lt; std::endl;
+    }
+
+    <span class="code-comment">//</span><span class="code-comment"> loop until end is signaled
+</span>    <span class="code-keyword">while</span>(!g_done)
+    {
+        std::unique_lock&lt;std::mutex&gt; locker(g_lockqueue);
+
+        g_queuecheck.wait(locker, [&amp;](){<span class="code-keyword">return</span> !g_codes.empty();});
+
+        <span class="code-comment">//</span><span class="code-comment"> if there are error codes in the queue process them
+</span>        <span class="code-keyword">while</span>(!g_codes.empty())
+        {
+            std::unique_lock&lt;std::mutex&gt; locker(g_lockprint);
+            std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">[logger]\tprocessing error:  "</span> &lt;&lt; g_codes.front() &lt;&lt; std::endl;
+            g_codes.pop();
+        }
+    }
+}</pre>
+
+<p>In addition to this <code>wait()</code> overloaded method there are two more waiting methods, both with similar overloads that take a predicate to avoid spurious wake-ups:</p>
+<ul>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/condition_variable/wait_for">wait_for</a>: blocks the thread until the condition variable is signaled or the specified timeout occurred.</li>
+  <li><a href="http://en.cppreference.com/w/cpp/thread/condition_variable/wait_until">wait_until</a>: blocks the thread until the condition variable is signaled or the specified moment in time was reached.</li>
+</ul>
+
+<p>The overload without a predicate of these two functions returns a <a href="http://en.cppreference.com/w/cpp/thread/cv_status">cv_status</a> that indicates whether a timeout occurred or the wake-up happened because the condition variable was signaled or because of a spurious wake-up.</p>
+
+<p>The standard also provides a function called <a href="http://en.cppreference.com/w/cpp/thread/notify_all_at_thread_exit">notify_all_at_thread_exit</a> that implements a mechanism to notify other threads that a given thread has finished, including destroying all <code>thread_local</code> objects. 
+This was introduced because waiting on threads with other mechanisms than <code>join()</code> could lead to incorrect and fatal behavior when <code>thread_local</code>s were used, since their destructors could have been called even after the waiting thread resumed and possible also finished (see <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2010/n3070.html">N3070</a> and <a href="http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2009/n2880.html">N2880</a> for more). 
+Typically, a call to this function must happen just before the thread exists.
+Below is an example of how <code>notify_all_at_thread_exit</code> can be used together with a <code>condition_variable</code> to synchronize two threads:&nbsp;</p>
+<pre>std::mutex              g_lockprint;
+std::mutex              g_lock;
+std::condition_variable g_signal;
+<span class="code-keyword">bool</span>                    g_done;
+
+<span class="code-keyword">void</span> workerfunc(std::mt19937&amp; generator)
+{
+   {
+      std::unique_lock&lt;std::mutex&gt; locker(g_lockprint);
+      std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">worker running..."</span> &lt;&lt; std::endl;
+   }
+
+   std::this_thread::sleep_for(std::chrono::seconds(<span class="code-digit">1</span> + generator() % <span class="code-digit">5</span>));
+
+   {
+      std::unique_lock&lt;std::mutex&gt; locker(g_lockprint);
+      std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">worker finished..."</span> &lt;&lt; std::endl;
+   }
+
+   std::unique_lock&lt;std::mutex&gt; <span class="code-keyword">lock</span>(g_lock);
+   g_done = <span class="code-keyword">true</span>;
+   std::notify_all_at_thread_exit(g_signal, std::move(<span class="code-keyword">lock</span>));
+}
+
+<span class="code-keyword">int</span> main()
+{
+   <span class="code-comment">//</span><span class="code-comment"> initialize a random generator
+</span>   std::mt19937 generator((unsigned <span class="code-keyword">int</span>)std::chrono::system_clock::now().time_since_epoch().count());
+
+   std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">main running..."</span> &lt;&lt; std::endl;
+
+   std::thread worker(workerfunc, std::<span class="code-keyword">ref</span>(generator));
+   worker.detach();
+
+   std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">main crunching..."</span> &lt;&lt; std::endl;
+
+   std::this_thread::sleep_for(std::chrono::seconds(<span class="code-digit">1</span> + generator() % <span class="code-digit">5</span>));
+
+   {
+      std::unique_lock&lt;std::mutex&gt; locker(g_lockprint);
+      std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">main waiting for worker..."</span> &lt;&lt; std::endl;
+   }
+
+   std::unique_lock&lt;std::mutex&gt; <span class="code-keyword">lock</span>(g_lock);
+   <span class="code-keyword">while</span>(!g_done) <span class="code-comment">//</span><span class="code-comment"> avoid spurious wake-ups
+</span>      g_signal.wait(<span class="code-keyword">lock</span>);
+
+   std::cout &lt;&lt; <span class="code-string">"</span><span class="code-string">main finished..."</span> &lt;&lt; std::endl;
+
+   <span class="code-keyword">return</span> <span class="code-digit">0</span>;
+}</pre>
+<p>If the worker finishes work before the main thread then the output would be:</p>
+<pre>main running...
+worker running...
+main crunching...
+worker finished...
+main waiting <span class="code-keyword">for</span> worker...
+main finished...</pre>
+<p>If the main thread finishes before the worker thread then the output would be:</p>
+<pre>main running...
+worker running...
+main crunching...
+main waiting <span class="code-keyword">for</span> worker...
+worker finished...
+main finished...</pre>
+
+<h2>Conclusions&nbsp;</h2>
+<p>The C++11 standard enables C++ developers to write multi-threading code in a standard, platform independent way. 
+This article is a walk-through the standard support for threads and synchronization mechanisms. 
+The <code>&lt;thread&gt;</code> header provides the class with the same name (and additional helpers) that represents a thread of execution. 
+Header <code>&lt;mutex&gt;</code> provides implementation of several mutexes and wrappers for synchronizing access to threads. 
+Header <code>&lt;condition_variable&gt;</code> provides two implementation of condition variables that enable blocking of one or more threads until either a notification is received from another thread or a timeout or a spurious wake-up occurs. Additional readings are recommended for more details on these topics.</p>
+
+
+						</div>
+						
+
+						<div class="float-right" style="margin:20px 0 0 10px;border:1px solid #ccc">
+						
+						</div>
+                        
+                        
+						
+						<h2>License</h2>
+						<div id="LicenseTerms"><p>This article, along with any associated source code and files, is licensed under <a href="http://www.codeproject.com/info/cpol10.aspx" rel="license">The Code Project Open License (CPOL)</a></p></div>
+						
+
+                        
+						<h2>Share</h2>
+				        <div class="share-list">
+					        
+				        </div> 
+    			        
+
+
+						
+						<h2 id="ctl00_AboutHeading">About the Author</h2>
+						    
+
+
+<div class="author-wrapper">
+
+    <div class="pic-wrapper"> 
+        <img id="ctl00_AboutAuthorRptr_ctl00_AboutAuthor_memberPhoto" class="profile-pic" src="http://www.codeproject.com/script/Membership/ProfileImages/{f0a51d43-8b5e-4a77-867b-cfa0dbc521ad}.jpg" style="border-width:0px;transform:rotate(-2deg);" />
+
+    </div>
+
+    <div class="container-member">  
+        <b><a id="ctl00_AboutAuthorRptr_ctl00_AboutAuthor_memberProfileLink" class="author" href="/Members/MariusBancila">Marius Bancila</a></b>
+
+        <table class="extended">
+        <tr>
+            <td rowspan="2" nowrap valign="middle">
+            <div id="ctl00_AboutAuthorRptr_ctl00_AboutAuthor_FollowOn" class="follow">
+	            <a href="http://www.twitter.com/mariusbancila"><img style="vertical-align:middle;border:0;height:24px;width:24px" alt="Twitter" src="/images/twitter32.png"/></a> 
+	            
+	            
+            </div>
+            </td>
+            <td width="100%">
+                <div class="company">
+                    <span id="ctl00_AboutAuthorRptr_ctl00_AboutAuthor_memberJobTitle">Software Developer (Senior)</span>
+	                <span id="ctl00_AboutAuthorRptr_ctl00_AboutAuthor_memberCompany">Visma Software</span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <span id="ctl00_AboutAuthorRptr_ctl00_AboutAuthor_memberLocation">Romania <img src="/script/Geo/Images/RO.gif" alt="Romania" width="16px" height="11px" /></span>
+            </td>
+        </tr>
+        </table>
+    </div>
+
+    <div class="description">
+        Marius Bancila is a Microsoft MVP for VC++. He works as a software developer for Visma, a Norwegian-based company. He is mainly focused on building desktop applications with VC++ and VC#. He keeps a blog at http://www.mariusbancila.ro/blog, focused on Windows programming. He is the co-founder of codexpert.ro, a community for Romanian C++ programmers.
+
+        
+    </div>
+
+</div><br />
+						
+						
+
+						<div class="clearfix"></div>
+
+						<div style="padding-top:8px">
+							
+						</div>
+
+					
+
+				    
+					</form>
+
+				</div>
+
+				
+				<div class="bottom-promo"> 
+				    
+				</div>
+				
+
+                
+        <h2 id="ctl00_AlsoRead_RelatedResults_ctl00_Header" class="also-read">You may also be interested in...</h2>
+        <table class="spaced content-list also-read">
+    
+	    <tr>
+        <td class="content-list-item" width="50%" valign="top">
+            <div class="thumbnail"><a id="ctl00_AlsoRead_RelatedResults_ctl01_Thumbnail" href="//www.codeproject.com/Articles/540912/Cplusplus-Threads-Make-your-multitasking-life-e"><img src="//codeproject.cachefly.net/script/Articles/Images/article100x80.png" alt="" style="border-width:0px;" /></a></div>
+            <div class="text">
+                <div class="title"><a id="ctl00_AlsoRead_RelatedResults_ctl01_Link" href="//www.codeproject.com/Articles/540912/Cplusplus-Threads-Make-your-multitasking-life-e">C++ 11 Threads: Make your (multitasking) life easier.</a></div>
+                
+            </div>
+        </td>
+	
+        <td class="content-list-item" width="50%" valign="top">
+            <div class="thumbnail"><a id="ctl00_AlsoRead_RelatedResults_ctl02_Thumbnail" href="http://www.codeproject.com/ResearchLibrary/117/Speed-Up-Your-Git-Repository-Introducing-Git-Over"><img src="http://www.codeproject.com/script/ResearchLibrary/Logos/LibraryItemThumbnail_117_100x130.png" alt="" style="border-width:0px;" /></a></div>
+            <div class="text">
+                <div class="title"><a id="ctl00_AlsoRead_RelatedResults_ctl02_Link" href="http://www.codeproject.com/ResearchLibrary/117/Speed-Up-Your-Git-Repository-Introducing-Git-Over">Speed Up Your Git Repository: Introducing Git-Over-FASP</a></div>
+                
+            </div>
+        </td>
+	    </tr>
+	
+	    <tr>
+        <td class="content-list-item" width="50%" valign="top">
+            <div class="thumbnail"><a id="ctl00_AlsoRead_RelatedResults_ctl03_Thumbnail" href="//www.codeproject.com/Articles/801130/Fast-Multi-Reader-Lock"><img src="//codeproject.cachefly.net/script/Articles/Images/article100x80.png" alt="" style="border-width:0px;" /></a></div>
+            <div class="text">
+                <div class="title"><a id="ctl00_AlsoRead_RelatedResults_ctl03_Link" href="//www.codeproject.com/Articles/801130/Fast-Multi-Reader-Lock">Fast Multi-Reader Lock</a></div>
+                
+            </div>
+        </td>
+	
+        <td class="content-list-item" width="50%" valign="top">
+            <div class="thumbnail"><a id="ctl00_AlsoRead_RelatedResults_ctl04_Thumbnail" href="//www.codeproject.com/Articles/23/SAPrefs-Netscape-like-Preferences-Dialog"><img src="/KB/tabs/saprefs/Thumb-23.gif" alt="" style="border-width:0px;" /></a></div>
+            <div class="text">
+                <div class="title"><a id="ctl00_AlsoRead_RelatedResults_ctl04_Link" href="//www.codeproject.com/Articles/23/SAPrefs-Netscape-like-Preferences-Dialog">SAPrefs - Netscape-like Preferences Dialog</a></div>
+                
+            </div>
+        </td>
+	    </tr>
+	
+	    <tr>
+        <td class="content-list-item" width="50%" valign="top">
+            <div class="thumbnail"><a id="ctl00_AlsoRead_RelatedResults_ctl05_Thumbnail" href="//www.codeproject.com/Articles/784/User-Level-Spin-Locks"><img src="//codeproject.cachefly.net/script/Articles/Images/article100x80.png" alt="" style="border-width:0px;" /></a></div>
+            <div class="text">
+                <div class="title"><a id="ctl00_AlsoRead_RelatedResults_ctl05_Link" href="//www.codeproject.com/Articles/784/User-Level-Spin-Locks">User-Level Spin Locks</a></div>
+                
+            </div>
+        </td>
+	
+        <td class="content-list-item" width="50%" valign="top">
+            <div class="thumbnail"><a id="ctl00_AlsoRead_RelatedResults_ctl06_Thumbnail" href="//www.codeproject.com/Articles/35159/WPF-Localization-Using-RESX-Files"><img src="/KB/WPF/WPF_Resx_Localization/Thumb-35159.gif" alt="" style="border-width:0px;" /></a></div>
+            <div class="text">
+                <div class="title"><a id="ctl00_AlsoRead_RelatedResults_ctl06_Link" href="//www.codeproject.com/Articles/35159/WPF-Localization-Using-RESX-Files">WPF Localization Using RESX Files</a></div>
+                
+            </div>
+        </td>
+	    </tr>
+	
+		</table>
+	
+
+
+
+				
+				
+
+					<h2>Comments and Discussions</h2>
+					
+					<p><img alt="Comment" src="/script/forums/images/NewComment.gif" width="12px" height="16px" />
+					<b>26 messages</b> have been posted for this article 
+					Visit <b><a id="ctl00_ArticleLink" href="/Articles/598695/Cplusplus-threads-locks-and-condition-variables">http://www.codeproject.com/Articles/598695/Cplusplus-threads-locks-and-condition-variables</a></b> to post and view comments on 
+					this article, or click <b><a id="ctl00_PrintWithMessage" href="/Articles/598695/Cplusplus-threads-locks-and-condition-variables?display=PrintAll">here</a></b> 
+					to get a print view with messages.</p>
+					
+				
+
+			</div>
+			
+		</td>
+		<td width="170px" class="article-wing-right">
+			
+		</td>
+		</tr></table>
+
+		
+		<div class="theme1-background" style="height:2px" id="stickyStop"></div>
+
+		<div class="extended tiny-text">
+			<div class="row">
+				<div class="float-left">
+					<a id="ctl00_PermaLink" itemprop="url" href="/Articles/598695/Cplusplus-threads-locks-and-condition-variables">Permalink</a> | 
+					<a id="ctl00_AdvertiseLink" href="http://developermedia.com/">Advertise </a> |
+					<a id="ctl00_PrivacyLink" href="/info/privacy.aspx">Privacy</a> |
+                    <a id="ctl00_TermsOfUseLink" href="/info/TermsOfUse.aspx">Terms of Use</a> |
+					<a id="ctl00_Mobile">Mobile</a>
+					<br />
+								
+					
+					Web02 |
+					2.8.151120.1 |
+					Last Updated 28 May 2013								
+				</div>
+
+                <div id="ctl00_GoogleTranslate" class="translate float-left"></div>      
+
+				<div class="float-right align-right">
+					Article Copyright 2013 by Marius Bancila<br />Everything else
+					Copyright &copy; <a href="mailto:webmaster@codeproject.com">CodeProject</a>, 1999-2015 <br />
+				</div>
+
+				
+
+			</div>
+		</div>
+		
+
+		<br clear="all" />
+		
+			
+
+	</div> 
+	</div>
+</div>
+
+
+<div style="display:none;" id="dm_AdTable">
+	
+</div>
+
+
+
+
+<script type="text/javascript" language="Javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script><script type='text/javascript'>//<![CDATA[
+if (typeof jQuery == 'undefined') {
+    document.write(unescape("%3Cscript src='/script/JS/jquery-1.6.2.min.js' type='text/javascript' %3E%3C/script%3E"));
+}//]]></script>
+<script type="text/javascript" language="Javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+<script type="text/javascript" language="Javascript" src="/Script/Membership/JS/MemberProfilePopup.min.js?v=1.3"></script>
+<script type="text/javascript" language="Javascript">//<![CDATA[
+$(document).ready(function () { processCodeBlocks.Initialise('#contentdiv'); });
+function googleTranslateElementInit() {  new google.translate.TranslateElement({   pageLanguage: 'en',   layout: google.translate.TranslateElement.InlineLayout.SIMPLE,   autoDisplay: false,   gaTrack: true,   gaId: 'UA-1735123-1'},  'ctl00_GoogleTranslate');}
+$(document).ready(function() { anchorAnimate();
+$('#RHSticky').sticky($('#stickyStop'));
+$('#ctl00_Nav').sticky($('#stickyStop'));
+});
+
+//]]>
+</script>
+
+
+</body>
+</html>
